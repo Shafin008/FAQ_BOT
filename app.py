@@ -9,8 +9,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFDirectoryLoader
-import ollama
-from langchain_community.docstore.in_memory import InMemoryDocstore
+
 
 # Loading Environment and constants
 load_dotenv()
