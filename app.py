@@ -17,10 +17,19 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# Check if keys are loaded (optional for debugging)
+if not OPENAI_API_KEY:
+    st.error("OpenAI API key is missing. Please configure it in the environment.")
+    st.stop()
+if not GROQ_API_KEY:
+    st.error("GROQ API key is missing. Please configure it in the environment.")
+    st.stop()
+
 # Constants
 DATA_PATH = './data/'
 MODEL_NAME = 'Llama3-8b-8192'
-EMBEDDING_MODEL_NAME = "text-embedding-3-large"
+EMBEDDING_MODEL_NAME = "text-embedding-ada-002"
+#  "text-embedding-3-large"
 VECTOR_STORE_NAME = "FAQ-BOT"
 PERSIST_DIRECTORY = "./faiss_db"
 
@@ -31,7 +40,8 @@ def vector_embedding():
 
         # initialize embedding model
         st.session_state.embeddings=OpenAIEmbeddings(
-            model=EMBEDDING_MODEL_NAME
+            model=EMBEDDING_MODEL_NAME,
+            openai_api_key=OPENAI_API_KEY
         )
         st.write("Initializing embedding model...")
 
