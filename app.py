@@ -10,7 +10,6 @@ from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 
-
 # Loading Environment and constants
 load_dotenv()
 API_KEY = os.getenv("GROQ_API_KEY")
