@@ -9,14 +9,18 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFDirectoryLoader
+from langchain_openai import OpenAIEmbeddings
 
 # Loading Environment and constants
 load_dotenv()
-API_KEY = os.getenv("GROQ_API_KEY")
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 # Constants
 DATA_PATH = './data/'
 MODEL_NAME = 'Llama3-8b-8192'
-EMBEDDING_MODEL_NAME = "nomic-embed-text"
+EMBEDDING_MODEL_NAME = "text-embedding-3-large"
 VECTOR_STORE_NAME = "FAQ-BOT"
 PERSIST_DIRECTORY = "./faiss_db"
 
@@ -26,7 +30,7 @@ def vector_embedding():
     if "vector_db" not in st.session_state:
 
         # initialize embedding model
-        st.session_state.embeddings=OllamaEmbeddings(
+        st.session_state.embeddings=OpenAIEmbeddings(
             model=EMBEDDING_MODEL_NAME
         )
         st.write("Initializing embedding model...")
@@ -40,7 +44,7 @@ def vector_embedding():
         # Chunkifying documents
         # initializing text splitter
         st.session_state.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=3000, chunk_overlap=200
+            chunk_size=1000, chunk_overlap=200
         )
         # chunkify documents
         st.session_state.documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
@@ -85,7 +89,7 @@ def main():
             # Initialize the language model
             llm = ChatGroq(
                 model=MODEL_NAME,
-                api_key=API_KEY)
+                api_key=GROQ_API_KEY)
             
             document_chain = create_stuff_documents_chain(
                 llm,

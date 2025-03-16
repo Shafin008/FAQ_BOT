@@ -1,9 +1,17 @@
-streamlit
-python-dotenv
-langchain
-langchain-community
-langchain-core
-langchain-groq
-langchain-ollama
-faiss-cpu
-pypdf
+# Core dependencies
+streamlit>=1.31.0
+python-dotenv>=1.0.0
+
+# LangChain dependencies
+langchain>=0.1.0
+langchain-groq>=0.0.1
+langchain-ollama>=0.0.1
+langchain-community>=0.0.1
+langchain-openai>=0.0.1
+langchain-core>=0.1.0
+
+# Vector store and embeddings
+faiss-cpu>=1.7.4
+
+# PDF processing
+pypdf>=4.0.0
