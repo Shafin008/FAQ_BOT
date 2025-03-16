@@ -6,5 +6,4 @@ langchain-core
 langchain-groq
 langchain-ollama
 faiss-cpu
-ollama
 pypdf
