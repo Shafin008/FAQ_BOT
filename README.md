@@ -69,7 +69,7 @@ streamlit run app.py
 
 ## 🎥 Demo
 
-![Demo GIF](https://your-demo-gif-link.com)
+![Demo Video](https://youtu.be/k57B7RFoUMw)
 
 ## 🤖 Interact with the Chatbot
 1. **Enter API Keys:** Provide your **Groq** and **OpenAI** API keys in the password fields on the Streamlit interface.
