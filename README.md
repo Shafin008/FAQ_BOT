@@ -33,7 +33,7 @@ These features make the chatbot an effective tool for learners, providing instan
  ┣ 📜 app.py                 # Main chatbot application  
  ┣ 📜 .env                   # Environment variables (API keys)  
  ┗ 📜 README.md              # Project documentation
- ┗ 📜 requirements.txt       # Library Requirements
+ ┗ 📜 requirements.txt       # Lists all Python dependencies for installation
 
 ```
 
@@ -56,30 +56,61 @@ These features make the chatbot an effective tool for learners, providing instan
    pip install -r requirements.txt  
    ```
 
-4. **Set up environment variables**  
-   - Create a `.env` file and add:  
-     ```
-     GROQ_API_KEY=your_groq_api_key
-     OPENAI_API_KEY=your_openai_api_key
-     ```
+## 🔧 Usage Instructions
+Once set up, users can run and interact with the chatbot as follows:
 
-5. **Run the chatbot**  
+1. **Run the App Locally**: Execute the following command:
    ```bash
-   streamlit run app.py  
+   streamlit run app.py
    ```
+   This will launch the app in a web browser at `http://localhost:8501`.
 
-## 🏃 Usage  
-- Click the **"Start Engine"** button to initialize the vector database.  
-- Enter your **course-related query** in the chat input.  
-- Get accurate answers with follow-up suggestions.  
+2. **Interact with the Chatbot**:
+   - First, enter your Groq and OpenAI API keys in the provided password fields on the Streamlit interface.
+   - Click the "Start Engine" button to initialize the vector database, which processes the PDF documents and generates embeddings.
+   - Use the chat input field to ask questions about the data engineering course. The bot will respond based on the retrieved document chunks, using the Grok LLM for natural language generation.
+   - Each response includes a prompt asking if the user is satisfied or needs further assistance, enhancing user engagement.
+
+The interface is designed for simplicity, making it accessible for users with minimal technical background.
+
+## 🔧 Deployment Details
+The app is already deployed on Streamlit Cloud, accessible at [https://course-faq-bot.streamlit.app/](https://course-faq-bot.streamlit.app/). For users wishing to deploy their own version:
+
+1. Push the repository to GitHub.
+2. Connect it to Streamlit Cloud via their platform.
+3. Set the following secrets in Streamlit Cloud’s settings:
+   ```
+   OPENAI_API_KEY=your-openai-API-key
+   GROQ_API_KEY=your-groq-API-key
+   ```
+4. Deploy the app, and it will be live for users to access.
+
+This deployment method ensures scalability and accessibility, with the live URL providing a demonstration of the chatbot’s functionality.
+
+## 🔧 Dependencies and Technical Stack
+The project relies on several key libraries, as detailed in `requirements.txt`. A summary of the technical stack includes:
+
+| Library         | Purpose                                      |
+|-----------------|----------------------------------------------|
+| `streamlit`     | Web app framework for the user interface     |
+| `langchain`     | RAG pipeline, LLM integration, document processing |
+| `faiss-cpu`     | Vector store for efficient document retrieval |
+| `pypdf`         | PDF processing and loading                   |
+| `python-dotenv` | Environment variable management              |
+
+These libraries ensure robust functionality, with `langchain` being particularly crucial for the RAG pipeline, integrating OpenAI embeddings and Grok’s LLM.
 
 ## 📌 Future Enhancements  
 - Multi-course support  
 - Integration with other LLMs  
-- Improved UI with advanced search filters  
+- Improved UI with advanced search filters
 
-## 🤝 Contributing  
-Contributions are welcome! Please fork the repo, create a branch, and submit a pull request.  
+#### 🤝 Contributing and Licensing
+The project welcomes contributions from the community. Users can submit issues or pull requests on GitHub, fostering collaboration and improvement. The project is licensed under the MIT License, which is permissive and allows for both commercial and non-commercial use. Users should create a `LICENSE` file if not already present, with details available at [MIT License](https://opensource.org/licenses/MIT).
 
-## 📜 License  
-MIT License.  
+#### Acknowledgements
+This project builds on the capabilities of several open-source tools and platforms, including:
+- [Streamlit](https://streamlit.io/) for the web interface.
+- [LangChain](https://langchain.com/) for RAG and LLM integration.
+
+
