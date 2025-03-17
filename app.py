@@ -14,33 +14,10 @@ from langchain_openai import OpenAIEmbeddings
 # Loading Environment and constants
 load_dotenv()
 
-# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-# GROQ_API_KEY = st.text_input("Groq API Key", type="password")
-# if not GROQ_API_KEY:
-#     st.info("Please add your Groq API key to continue.", icon="🗝️")
-#     st.stop()
-# # OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-# st.write(
-#     "To use this app, you need to provide a Groq API Key which you can get [here](https://console.groq.com/keys) and an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys)"
-# )
-# OPENAI_API_KEY = st.text_input("OpenAI API Key", type="password")
-# if not OPENAI_API_KEY:
-#     st.info("Please add your OpenAI API key to continue.", icon="🗝️")
-#     st.stop()
-
-# Check if keys are loaded (optional for debugging)
-# if not OPENAI_API_KEY:
-#     st.error("OpenAI API key is missing. Please configure it in the environment.")
-#     st.stop()
-# if not GROQ_API_KEY:
-#     st.error("GROQ API key is missing. Please configure it in the environment.")
-#     st.stop()
-
 # Constants
 DATA_PATH = './data/'
 MODEL_NAME = 'Llama3-8b-8192'
-EMBEDDING_MODEL_NAME = "text-embedding-ada-002"
-#  "text-embedding-3-large"
+EMBEDDING_MODEL_NAME = "text-embedding-ada-002" #"text-embedding-3-large"
 VECTOR_STORE_NAME = "FAQ-BOT"
 PERSIST_DIRECTORY = "./faiss_db"
 
@@ -130,18 +107,22 @@ def main():
                 model=MODEL_NAME,
                 api_key=GROQ_API_KEY)
             
+            # chaining our docs with llm
             document_chain = create_stuff_documents_chain(
                 llm,
                 prompt_template
             )
 
+            # building the retriever from the vector db
             retriever = st.session_state.vector_db.as_retriever()
 
+            # chaining the doc chain and retriever
             retrieval_chain = create_retrieval_chain(
                  retriever,
                  document_chain
             )
 
+            # invoking response from user queries
             response = retrieval_chain.invoke(
             {'input': query_prompt}
             )
