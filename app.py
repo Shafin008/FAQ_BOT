@@ -98,9 +98,23 @@ def main():
         vector_embedding()
         st.success("The Engine is ready.", icon="✅")
 
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
     # User query
     query_prompt = st.chat_input("Enter Your Question Regarding the course....")
     if query_prompt:
+        with st.chat_message("user"):
+            st.markdown(query_prompt) 
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": query_prompt})
+
         with st.spinner("Generating response..."):
             # llm  
             # Initialize the language model
@@ -127,8 +141,10 @@ def main():
             response = retrieval_chain.invoke(
             {'input': query_prompt}
             )
-            
-            st.write(response['answer'])
+        with st.chat_message("assistant"):
+            st.markdown(response['answer'])
+        # Add assistant response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response['answer']})
 
 if __name__ == "__main__":
     main()
