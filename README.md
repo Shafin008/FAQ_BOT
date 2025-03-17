@@ -1,12 +1,20 @@
-# 📚 FAQ Chatbot for Data Engineering Zoomcamp  
+# 📚 FAQ Chatbot Application
 
-This is an **AI-powered chatbot** designed to answer frequently asked questions about the **Data Engineering Zoomcamp** course. It utilizes **LangChain, FAISS, and Llama3** to provide accurate and contextual responses from a **233-page PDF** of FAQs.  
+This is an **AI-powered web-based chatbot** application designed to answer frequently asked questions about the **Data Engineering Zoomcamp** [course](https://github.com/DataTalksClub/data-engineering-zoomcamp). It utilizes **LangChain, FAISS, and Llama3** to provide accurate and contextual responses from a **233-page PDF** of FAQs. It leverages advanced technologies for retrieval-augmented generation (RAG), making it a powerful tool for course-related queries. Key features include:
+
+- **PDF Document Processing**: The app loads and chunks PDF files from a specified directory (`./data/`), enabling users to base queries on course materials.
+- **Vector Database Management**: It uses FAISS (Facebook AI Similarity Search) to store document embeddings, ensuring fast and efficient retrieval of relevant information.
+- **AI-Powered Q&A**: Combines OpenAI embeddings for document representation with Grok's Llama3-8b-8192 model for generating accurate, context-aware responses.
+- **Interactive User Interface**: Built with Streamlit, offering a simple interface where users can input API keys, start the engine, and ask questions via a chat input field.
+- **Deployment Readiness**: Successfully deployed on Streamlit Cloud, accessible at [course-faq-app](https://course-faq-bot.streamlit.app/), demonstrating scalability and accessibility.
+
+These features make the chatbot an effective tool for learners, providing instant answers based on course documents and ensuring a user-friendly experience.
 
 ## 🚀 Features  
 - **AI-powered Responses**: Uses `Llama3-8b-8192` for intelligent responses.  
 - **PDF Knowledge Base**: Extracts and processes FAQs from the course document.  
 - **Vector Search**: Utilizes `FAISS` for efficient retrieval.  
-- **Embeddings**: Uses `OllamaEmbeddings` for document vectorization.  
+- **Embeddings**: Uses `OpenAIEmbeddings` for document vectorization.  
 - **Streamlit UI**: Interactive chatbot with a user-friendly interface.  
 
 ## 🛠️ Tech Stack  
@@ -14,7 +22,7 @@ This is an **AI-powered chatbot** designed to answer frequently asked questions 
 - **Streamlit** (for UI)  
 - **LangChain** (for LLM and retrieval chain)  
 - **FAISS** (for vector storage)  
-- **OllamaEmbeddings** (for text embedding)  
+- **OpenAIEmbeddings** (for text embedding)  
  
 
 ## 📂 Project Structure  
