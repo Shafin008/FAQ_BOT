@@ -1,5 +1,9 @@
 # 📚 FAQ Chatbot Application
 
+![RAG BASED APP](https://machinelearningmastery.com/wp-content/uploads/2024/08/mlm-awan-rag-applications-llamaindex.png)
+
+<p align="center">RAG based application cycle</p>
+
 This is an **AI-powered web-based chatbot** application designed to answer frequently asked questions about the **Data Engineering Zoomcamp** [course](https://github.com/DataTalksClub/data-engineering-zoomcamp). It utilizes **LangChain, FAISS, and Llama3** to provide accurate and contextual responses from a **233-page PDF** of FAQs. It leverages advanced technologies for retrieval-augmented generation (RAG), making it a powerful tool for course-related queries. Key features include:
 
 - **PDF Document Processing**: The app loads and chunks PDF files from a specified directory (`./data/`), enabling users to base queries on course materials.
@@ -98,7 +102,7 @@ The project relies on several key libraries, as detailed in `requirements.txt`. 
 | `pypdf`         | PDF processing and loading                   |
 | `python-dotenv` | Environment variable management              |
 
-These libraries ensure robust functionality, with `langchain` being particularly crucial for the RAG pipeline, integrating OpenAI embeddings and Grok’s LLM.
+These libraries ensure robust functionality, with `langchain` being particularly crucial for the RAG pipeline, integrating OpenAI embeddings and Groq’s LLM.
 
 ## 📌 Future Enhancements  
 - Multi-course support  
