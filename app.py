@@ -33,16 +33,16 @@ st.write(
     "To use this app, you need to provide a Groq API Key which you can get [here](https://console.groq.com/keys) and an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys)"
 )
 
-
-GROQ_API_KEY = st.text_input("Groq API Key", type="password")
-if not GROQ_API_KEY:
-    st.info("Please add your Groq API key to continue.", icon="🗝️")
-    st.stop()
-
-OPENAI_API_KEY = st.text_input("OpenAI API Key", type="password")
-if not OPENAI_API_KEY:
-    st.info("Please add your OpenAI API key to continue.", icon="🗝️")
-    st.stop()
+with st.expander("Click here to enter your API KEYs"):
+    GROQ_API_KEY = st.text_input("Groq API Key", type="password")
+    if not GROQ_API_KEY:
+        st.info("Please add your Groq API key to continue.", icon="🗝️")
+        st.stop()
+    
+    OPENAI_API_KEY = st.text_input("OpenAI API Key", type="password")
+    if not OPENAI_API_KEY:
+        st.info("Please add your OpenAI API key to continue.", icon="🗝️")
+        st.stop()
 
 
 # Vector Embedding
