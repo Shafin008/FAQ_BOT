@@ -14,16 +14,27 @@ from langchain_openai import OpenAIEmbeddings
 # Loading Environment and constants
 load_dotenv()
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# GROQ_API_KEY = st.text_input("Groq API Key", type="password")
+# if not GROQ_API_KEY:
+#     st.info("Please add your Groq API key to continue.", icon="🗝️")
+#     st.stop()
+# # OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# st.write(
+#     "To use this app, you need to provide a Groq API Key which you can get [here](https://console.groq.com/keys) and an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys)"
+# )
+# OPENAI_API_KEY = st.text_input("OpenAI API Key", type="password")
+# if not OPENAI_API_KEY:
+#     st.info("Please add your OpenAI API key to continue.", icon="🗝️")
+#     st.stop()
 
 # Check if keys are loaded (optional for debugging)
-if not OPENAI_API_KEY:
-    st.error("OpenAI API key is missing. Please configure it in the environment.")
-    st.stop()
-if not GROQ_API_KEY:
-    st.error("GROQ API key is missing. Please configure it in the environment.")
-    st.stop()
+# if not OPENAI_API_KEY:
+#     st.error("OpenAI API key is missing. Please configure it in the environment.")
+#     st.stop()
+# if not GROQ_API_KEY:
+#     st.error("GROQ API key is missing. Please configure it in the environment.")
+#     st.stop()
 
 # Constants
 DATA_PATH = './data/'
@@ -40,8 +51,7 @@ def vector_embedding():
 
         # initialize embedding model
         st.session_state.embeddings=OpenAIEmbeddings(
-            model=EMBEDDING_MODEL_NAME,
-            openai_api_key=OPENAI_API_KEY
+            model=EMBEDDING_MODEL_NAME
         )
         st.write("Initializing embedding model...")
 
@@ -85,6 +95,25 @@ def main():
     # Title and Description for the app
     st.title("FAQ Chatbot 🤖")
     st.write("Please click the button below to get the ENGINE ready 🔥🔥🔥. Once the ENGINE is ready, please ask your questions.")
+
+    st.write(
+        "For asking question to this chatbot you can go to this course [website](https://github.com/DataTalksClub/data-engineering-zoomcamp) and ask any query about this course."
+    )
+
+    st.write(
+        "To use this app, you need to provide a Groq API Key which you can get [here](https://console.groq.com/keys) and an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys)"
+    )
+
+    # GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    GROQ_API_KEY = st.text_input("Groq API Key", type="password")
+    if not GROQ_API_KEY:
+        st.info("Please add your Groq API key to continue.", icon="🗝️")
+        st.stop()
+
+    OPENAI_API_KEY = st.text_input("OpenAI API Key", type="password")
+    if not OPENAI_API_KEY:
+        st.info("Please add your OpenAI API key to continue.", icon="🗝️")
+        st.stop()
     
     # Button for creating database
     if st.button("Start Engine"):
