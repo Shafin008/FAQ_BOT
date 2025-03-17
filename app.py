@@ -48,37 +48,40 @@ with st.expander("Click here to enter your API KEYs"):
 # Vector Embedding
 def vector_embedding():
     if "vector_db" not in st.session_state:
+        
+        with st.spinner("Loading & Chunkifying Documents..."):
+            # Document loading
+            # initializing loader
+            st.session_state.loader = PyPDFDirectoryLoader(DATA_PATH)
+            # loading documents
+            st.session_state.docs = st.session_state.loader.load()
 
-        # initialize embedding model
-        st.session_state.embeddings=OpenAIEmbeddings(
-            model=EMBEDDING_MODEL_NAME,
-            api_key=OPENAI_API_KEY
-        )
-        st.write("Initializing embedding model...")
+            # Chunkifying documents
+            # initializing text splitter
+            st.session_state.text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=200
+            )
+            # chunkify documents
+            st.session_state.documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
+            # st.write("Loading & Chunkifying Documents...")
 
-        # Document loading
-        # initializing loader
-        st.session_state.loader = PyPDFDirectoryLoader(DATA_PATH)
-        # loading documents
-        st.session_state.docs = st.session_state.loader.load()
+        with st.spinner("Initializing embedding model..."):
+            # initialize embedding model
+            st.session_state.embeddings=OpenAIEmbeddings(
+                model=EMBEDDING_MODEL_NAME,
+                api_key=OPENAI_API_KEY
+            )
+            # st.write("Initializing embedding model...")
 
-        # Chunkifying documents
-        # initializing text splitter
-        st.session_state.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, chunk_overlap=200
-        )
-        # chunkify documents
-        st.session_state.documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
-        st.write("Loading & Chunkifying Documents...")
-
-        # creating our vector database
-        st.session_state.vector_db = FAISS.from_documents(
-            st.session_state.documents,
-            st.session_state.embeddings,
-        ) 
-        # saving session
-        st.session_state.vector_db.save_local(PERSIST_DIRECTORY)   
-        st.write("Initiating Vector Database...")
+        with st.spinner("Initiating Vector Database..."):
+            # creating our vector database
+            st.session_state.vector_db = FAISS.from_documents(
+                st.session_state.documents,
+                st.session_state.embeddings,
+            ) 
+            # saving session
+            st.session_state.vector_db.save_local(PERSIST_DIRECTORY)   
+            # st.write("Initiating Vector Database...")
 
 def main():
     # Creating system prompt template
@@ -96,7 +99,7 @@ def main():
     # Button for creating database
     if st.button("Start Engine"):
         vector_embedding()
-        st.write("Vector Database is ready....")
+        st.success("The Engine is ready.", icon="✅")
 
     # User query
     query_prompt = st.chat_input("Enter Your Question Regarding the course....")
