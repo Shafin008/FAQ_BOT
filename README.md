@@ -91,9 +91,9 @@ We welcome contributions! Feel free to submit a PR or open an issue.
 This project is licensed under the **MIT License**.
 
 ## 📬 Contact
-📧 Email: [your.email@example.com](mailto:shafinmahmud114@gmail.com)  
-🐦 Twitter: [@yourhandle](https://x.com/shafinmahmud114)  
-💼 LinkedIn: [Your Profile](https://www.linkedin.com/in/shafin-mahmud-jalal-8a76b3143/)
+📧 Email: [shafinmahmud114@gmail.com](mailto:shafinmahmud114@gmail.com)  
+🐦 Twitter: [@shafinmahmud114](https://x.com/shafinmahmud114)  
+💼 LinkedIn: [Shafin Mahmud Jalal](https://www.linkedin.com/in/shafin-mahmud-jalal-8a76b3143/)
 
 ---
 
