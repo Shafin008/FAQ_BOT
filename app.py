@@ -63,7 +63,6 @@ def vector_embedding():
             )
             # chunkify documents
             st.session_state.documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
-            # st.write("Loading & Chunkifying Documents...")
 
         with st.spinner("Initializing embedding model..."):
             # initialize embedding model
@@ -71,7 +70,6 @@ def vector_embedding():
                 model=EMBEDDING_MODEL_NAME,
                 api_key=OPENAI_API_KEY
             )
-            # st.write("Initializing embedding model...")
 
         with st.spinner("Initiating Vector Database..."):
             # creating our vector database
@@ -81,7 +79,6 @@ def vector_embedding():
             ) 
             # saving session
             st.session_state.vector_db.save_local(PERSIST_DIRECTORY)   
-            # st.write("Initiating Vector Database...")
 
 def main():
     # Creating system prompt template
