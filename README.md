@@ -32,7 +32,9 @@ These features make the chatbot an effective tool for learners, providing instan
  ┣ 📁 faiss_db/              # FAISS vector database  
  ┣ 📜 app.py                 # Main chatbot application  
  ┣ 📜 .env                   # Environment variables (API keys)  
- ┗ 📜 README.md              # Project documentation  
+ ┗ 📜 README.md              # Project documentation
+ ┗ 📜 requirements.txt       # Library Requirements
+
 ```
 
 ## 🔧 Installation & Setup  
@@ -57,7 +59,8 @@ These features make the chatbot an effective tool for learners, providing instan
 4. **Set up environment variables**  
    - Create a `.env` file and add:  
      ```
-     GROQ_API_KEY=your_api_key
+     GROQ_API_KEY=your_groq_api_key
+     OPENAI_API_KEY=your_openai_api_key
      ```
 
 5. **Run the chatbot**  
