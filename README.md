@@ -1,4 +1,4 @@
-# FAQ Chatbot for Data Engineering Zoomcamp 🚀
+# FAQ Chatbot 🚀
 
 ## 📌 Introduction
 The **FAQ Chatbot** is an AI-powered assistant designed to help users with queries related to the **[Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp)**. This chatbot processes a 233-page FAQ document and provides relevant answers in an interactive manner. The system is built with **Streamlit**, **LangChain**, and **FAISS**, using **LLMs** to generate responses dynamically.
