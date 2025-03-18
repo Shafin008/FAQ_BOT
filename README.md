@@ -71,7 +71,7 @@ You can either:
 
 ### 5️⃣ Run the App
 ```bash
-streamlit run pdf_app.py
+streamlit run app.py
 ```
 
 ## 🤖 Using the Chatbot
