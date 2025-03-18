@@ -1,39 +1,42 @@
-# FAQ Chatbot 🚀
+# PDF Question-Answering Chatbot 🤖
 
 ## 📌 Introduction
-The **FAQ Chatbot** is an AI-powered assistant designed to help users with queries related to the **[Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp)**. This chatbot processes a 233-page FAQ document and provides relevant answers in an interactive manner. The system is built with **Streamlit**, **LangChain**, and **FAISS**, using **LLMs** to generate responses dynamically.
-
-🔗 **Live App:** [course-faq-bot.streamlit.app](https://course-faq-bot.streamlit.app/)
+The **PDF Question-Answering Chatbot** is an AI-powered assistant designed to help users extract information from any PDF document. This versatile tool allows you to upload your PDFs and ask questions about their content, receiving accurate and contextual responses. The system is built with **Streamlit**, **LangChain**, **FAISS**, and leverages state-of-the-art LLMs to generate dynamic responses.
 
 ## ✨ Features
-✅ Provides quick and accurate answers to FAQs from the **Data Engineering Zoomcamp** course.\
-✅ Uses **FAISS** for fast vector search on a 233-page FAQ document.\
-✅ Supports **OpenAI** & **Groq LLMs** for natural language understanding.\
-✅ Simple and interactive UI with **Streamlit**.\
-✅ Secure API key input via **Streamlit Expander**.
+✅ Process and analyze **any PDF document** you upload\
+✅ Ask questions about document content and receive AI-generated answers\
+✅ Uses **FAISS** for fast and efficient vector search capabilities\
+✅ Supports **Groq** and **OpenAI** models for natural language processing\
+✅ Clean, interactive UI built with **Streamlit**\
+✅ Secure API key management via **Streamlit Expander**\
+✅ Document chunking for optimal context retrieval
 
 ## 🛠️ Tech Stack
 - **Python**  
-- **Streamlit** (for UI)  
-- **LangChain** (for LLM and retrieval chain)  
-- **FAISS** (for vector storage)  
-- **OpenAIEmbeddings** (for text embedding)  
+- **Streamlit** (for user interface)  
+- **LangChain** (for document processing and retrieval chains)  
+- **FAISS** (for vector storage and similarity search)  
+- **OpenAI Embeddings** (for text embedding)
+- **Groq LLM** (for response generation)
 
 ## 🚀 How It Works
-1. The chatbot loads the FAQ document (233-page PDF) and splits it into manageable chunks.
-2. These chunks are embedded using **OpenAI's embedding model**.
-3. FAISS is used to store and retrieve relevant embeddings.
-4. A retrieval chain fetches the most relevant data, which is then processed by the language model.
-5. The chatbot provides responses in a conversational format, asking if the user needs further assistance.
+1. Upload any PDF document through the Streamlit interface
+2. The application splits the document into manageable chunks
+3. These chunks are embedded using **OpenAI's embedding model**
+4. FAISS stores these embeddings in a vector database for efficient retrieval
+5. When you ask a question, the system retrieves the most relevant document sections
+6. **Groq's LLM** processes these sections along with your question to generate a contextual response
+7. The chatbot presents answers in a conversational format, asking if you need additional information
 
 ## 🏗️ Project Structure
 ```
-FAQ_BOT/
-│── data/                  # Directory containing FAQ PDF files
+PDF_Chatbot/
 │── faiss_db/              # Persisted FAISS database
-│── app.py                 # Main Streamlit application
+│── pdf_app.py             # Main Streamlit application
 │── requirements.txt       # Python dependencies
-│── .env.example           # Example environment variables
+│── temp.pdf               # Temporary storage for uploaded PDF
+│── .env                   # Environment variables (API keys)
 │── README.md              # Documentation
 ```
 
@@ -44,7 +47,7 @@ git clone https://github.com/Shafin008/FAQ_BOT.git
 cd FAQ_BOT
 ```
 
-### 2️⃣ Create a Virtual Environment (Optional but Recommended)
+### 2️⃣ Create a Virtual Environment
 ```bash
 python -m venv venv
 source venv/bin/activate  # On macOS/Linux
@@ -57,45 +60,55 @@ pip install -r requirements.txt
 ```
 
 ### 4️⃣ Set Up API Keys
-To use the chatbot, you need API keys for **Groq** and **OpenAI**.
+You'll need API keys for both services:
 
 - **Groq API Key:** [Get it here](https://console.groq.com/keys)
 - **OpenAI API Key:** [Get it here](https://platform.openai.com/account/api-keys)
 
+You can either:
+- Add them to a `.env` file in the project root
+- Input them directly in the Streamlit interface when prompted
+
 ### 5️⃣ Run the App
 ```bash
-streamlit run app.py
+streamlit run pdf_app.py
 ```
 
-## 🎥 Demo
+## 🤖 Using the Chatbot
+1. **Enter Your API Keys**: Provide your Groq and OpenAI API keys in the password fields (click "Click here to enter your API KEYs")
+2. **Upload a PDF**: Expand the file upload section and upload any PDF document you want to query
+3. **Start Engine**: Click the "Start Engine" button to process your document into the vector database
+4. **Ask Questions**: Use the chat input to ask specific questions about the document content
+5. **Get Answers**: Receive contextual responses based on the document's content
+6. **Follow-up**: The bot will ask if you're satisfied or need more information
 
-[Watch the Video](https://youtu.be/k57B7RFoUMw)
-
-## 🤖 Interact with the Chatbot
-1. **Enter API Keys:** Provide your **Groq** and **OpenAI** API keys in the password fields on the Streamlit interface.
-2. **Start Engine:** Click the **"Start Engine"** button to initialize the vector database, which processes the FAQ PDF document and generates embeddings.
-3. **Ask a Question:** Use the chat input field to ask questions about the data engineering course.
-4. **Get Responses:** The bot retrieves relevant document chunks and uses **Groq's LLM** for natural language generation.
-5. **User Engagement:** Each response includes a follow-up prompt asking if you are satisfied or need further assistance.
+## 💡 Example Use Cases
+- **Academic Research**: Extract specific information from research papers
+- **Legal Document Analysis**: Query complex legal documents for specific clauses or information
+- **Technical Documentation**: Ask questions about technical manuals or guides
+- **Course Materials**: Learn from educational PDFs with interactive Q&A
+- **Financial Reports**: Extract insights from financial documents through natural language queries
 
 ## 🔮 Future Enhancements
-✅ Add support for multiple courses.\
-✅ Implement a feedback system to improve responses.\
-✅ Deploy a **REST API** for broader accessibility.\
-✅ Integrate voice-based interaction.
+✅ Add support for multiple document formats (DOCX, TXT, etc.)\
+✅ Implement document summarization capabilities\
+✅ Add option to compare information across multiple documents\
+✅ Create visualization tools for document insights\
+✅ Deploy as a standalone web service with user accounts
 
 ## 🤝 Contributing
-We welcome contributions! Feel free to submit a PR or open an issue.
+Contributions are welcome! Please feel free to submit a Pull Request or open an Issue if you have suggestions or encounter problems.
 
 ## 📜 License
-This project is licensed under the **MIT License**.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 📬 Contact
+If you have any questions or suggestions, feel free to reach out:
+
 📧 Email: [shafinmahmud114@gmail.com](mailto:shafinmahmud114@gmail.com)  
 🐦 Twitter: [@shafinmahmud114](https://x.com/shafinmahmud114)  
 💼 LinkedIn: [Shafin Mahmud Jalal](https://www.linkedin.com/in/shafin-mahmud-jalal-8a76b3143/)
 
 ---
 
-⭐ If you find this project helpful, give it a **star**!
-
+⭐ If you find this project helpful, please consider giving it a star!
