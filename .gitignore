@@ -175,4 +175,6 @@ cython_debug/
 
 .env
 
-temp.pdf
+# Ignore temporary PDF files
+# Ignore numbered temporary PDF files
+temp_[0-9]*.pdf

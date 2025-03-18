@@ -65,26 +65,39 @@ with st.expander("Click here to enter your API KEYs"):
         st.stop()  # Stop execution if key is missing
 
 
-def process_pdf(file) -> List[Document]:
+def process_documents(uploaded_files) -> List[Document]:
     """
-    Loads and splits an uploaded PDF file into chunks.
+    Loads and splits multiple uploaded PDF files into chunks.
     
     Args:
-        file: The uploaded PDF file object
+        uploaded_files: List of uploaded PDF file objects
         
     Returns:
         List[Document]: A list of document chunks after splitting
     """
-    with open("temp.pdf", "wb") as f:  # Open a temporary file to save the uploaded PDF
-        f.write(file.read())  # Write the uploaded file content to the temporary file
+    all_documents = []
+    for i, file in enumerate(uploaded_files):
+        # Create a unique filename for each uploaded file
+        temp_filename = f"temp_{i}.pdf"
+        
+        with open(temp_filename, "wb") as f:
+            f.write(file.read())
+        
+        loader = PyPDFLoader(temp_filename)
+        documents = loader.load()
+        
+        # Add source information to each document
+        for doc in documents:
+            doc.metadata["source"] = file.name
+            
+        all_documents.extend(documents)
     
-    loader = PyPDFLoader("temp.pdf")  # Create a PDF loader for the temporary file
-    documents = loader.load()  # Load the PDF content into documents
-    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)  # Create a text splitter with 1000 character chunks and 200 character overlap
-    return splitter.split_documents(documents)  # Split the documents and return the chunks
+    # Split all documents into chunks
+    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    return splitter.split_documents(all_documents)
 
 # File upload section 
-uploaded_file: Optional[bytes] = st.file_uploader("Upload a PDF file", type=["pdf"])  # Create a file uploader for PDF files
+uploaded_files = st.file_uploader("Upload PDF files", type=["pdf"], accept_multiple_files=True) # Create a file uploader for PDF files
 
 
 def vector_embedding() -> None:
@@ -96,24 +109,27 @@ def vector_embedding() -> None:
     2. Initializing OpenAI embeddings
     3. Creating and saving a FAISS vector database
     """
-    if "vector_db" in st.session_state:  # Check if vector_db already exists in session state
-        del st.session_state.vector_db  # Delete existing vector database from session state
+    # if "vector_db" in st.session_state:  # Check if vector_db already exists in session state
+    #     del st.session_state.vector_db  # Delete existing vector database from session state
     
-    if uploaded_file:  # Check if a file has been uploaded
-        with st.spinner("Loading & Chunkifying Documents..."):  # Show a spinner while processing documents
-            st.session_state.documents = process_pdf(uploaded_file)  # Process the uploaded PDF and store chunks in session state
     
-        with st.spinner("Initializing Vector Database..."):  # Show a spinner while initializing the vector database
-            st.session_state.embeddings = OpenAIEmbeddings(  # Initialize OpenAI embeddings
-                model=EMBEDDING_MODEL_NAME,  # Use the specified embedding model
-                api_key=OPENAI_API_KEY  # Use the provided OpenAI API key
+    if uploaded_files and len(uploaded_files) > 0:
+        with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):
+            st.session_state.documents = process_documents(uploaded_files)
+            
+        with st.spinner("Initializing Vector Database..."):
+            st.session_state.embeddings = OpenAIEmbeddings(
+                model=EMBEDDING_MODEL_NAME,
+                api_key=OPENAI_API_KEY
             )
         
-            st.session_state.vector_db = FAISS.from_documents(  # Create a FAISS vector database from documents
-                st.session_state.documents,  # Use the documents stored in session state
-                st.session_state.embeddings,  # Use the embeddings stored in session state
+            st.session_state.vector_db = FAISS.from_documents(
+                st.session_state.documents,
+                st.session_state.embeddings,
             )
-            st.session_state.vector_db.save_local(PERSIST_DIRECTORY)  # Save the vector database locally
+            st.session_state.vector_db.save_local(PERSIST_DIRECTORY)
+    else:
+        st.error("Please upload at least one PDF file.")
 
 
 def main() -> None:
@@ -134,7 +150,7 @@ def main() -> None:
     
     if st.button("Start Engine"):  # Create a button to start the engine
         # making sure user uploads file before the embedding starts
-        if uploaded_file:
+        if uploaded_files:
             vector_embedding()  # Call the vector_embedding function when button is clicked
             st.success("The Engine is ready.", icon="✅")  # Show success message when engine is ready
             st.session_state.messages = []  # Reset chat history
@@ -150,7 +166,7 @@ def main() -> None:
     # Define the prompt template for the chatbot
     prompt_template = ChatPromptTemplate.from_template(
         """
-        You are an AI language model assistant who is expert in answering questions about the uploaded document from the provided context. Please provide the most accurate response based on the question. Also, at the end of your answer, ask the user if they are satisfied with your answer or need further assistance. If the user is satisfied and the {input} is positive such as 'yes', 'thanks', thank you', etc. then you don't need to answer based on the context, you just give a positive and satisfactory reply and stop asking anything. For further assistance, if the {input} is 'no' or 'no thanks', that means you don't need to answer based on the context, you just give a positive and satisfactory reply and stop asking anything. Don't write extra words in your answer if the user is satisfied or don't need assistance.
+        You are an AI language model assistant who is expert in answering questions about the uploaded document from the provided context. Please provide the most accurate response based on the question. Please, remember what answer you gave previously. Also, at the end of your answer, ask the user if they are satisfied with your answer or need further assistance. If the user is satisfied and the {input} is positive such as 'yes', 'thanks', thank you', etc. then you don't need to answer based on the context, you just give a positive and satisfactory reply and stop asking anything. For further assistance, if the {input} is 'no' or 'no thanks', that means you don't need to answer based on the context, you just give a positive and satisfactory reply and stop asking anything. Don't write extra words in your answer if the user is satisfied or don't need assistance.
         <context>
         {context}
         <context>
@@ -161,7 +177,7 @@ def main() -> None:
     
     query_prompt: Optional[str] = st.chat_input("Enter Your Question Regarding the course....")  # Create a chat input for user questions
     
-    if uploaded_file:
+    if uploaded_files:
         if query_prompt:  # Check if user has entered a question
             with st.chat_message("user"):  # Create a chat message container for user
                 st.markdown(query_prompt)  # Display the user's question using markdown
