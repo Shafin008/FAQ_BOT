@@ -158,38 +158,42 @@ def main() -> None:
         Question: {input}
         """
     )
-
+    
     query_prompt: Optional[str] = st.chat_input("Enter Your Question Regarding the course....")  # Create a chat input for user questions
-    if query_prompt:  # Check if user has entered a question
-        with st.chat_message("user"):  # Create a chat message container for user
-            st.markdown(query_prompt)  # Display the user's question using markdown
-        st.session_state.messages.append({"role": "user", "content": query_prompt})  # Add user message to chat history
+    
+    if uploaded_file:
+        if query_prompt:  # Check if user has entered a question
+            with st.chat_message("user"):  # Create a chat message container for user
+                st.markdown(query_prompt)  # Display the user's question using markdown
+            st.session_state.messages.append({"role": "user", "content": query_prompt})  # Add user message to chat history
 
-        with st.spinner("Generating response..."):  # Show a spinner while generating response
-            llm = ChatGroq(  # Initialize ChatGroq LLM
-                model=MODEL_NAME,  # Use the specified model
-                api_key=GROQ_API_KEY  # Use the provided Groq API key
-            )
+            with st.spinner("Generating response..."):  # Show a spinner while generating response
+                llm = ChatGroq(  # Initialize ChatGroq LLM
+                    model=MODEL_NAME,  # Use the specified model
+                    api_key=GROQ_API_KEY  # Use the provided Groq API key
+                )
+                
+                document_chain = create_stuff_documents_chain(  # Create a chain for combining documents with prompt
+                    llm,  # Use the initialized LLM
+                    prompt_template  # Use the defined prompt template
+                )
+
+                retriever = st.session_state.vector_db.as_retriever()  # Convert vector database to retriever
+                
+                retrieval_chain = create_retrieval_chain(  # Create a retrieval chain
+                    retriever,  # Use the created retriever
+                    document_chain  # Use the created document chain
+                )
+
+                response = retrieval_chain.invoke(  # Invoke the retrieval chain
+                    {'input': query_prompt}  # Pass the user's question as input
+                )
             
-            document_chain = create_stuff_documents_chain(  # Create a chain for combining documents with prompt
-                llm,  # Use the initialized LLM
-                prompt_template  # Use the defined prompt template
-            )
-
-            retriever = st.session_state.vector_db.as_retriever()  # Convert vector database to retriever
-            
-            retrieval_chain = create_retrieval_chain(  # Create a retrieval chain
-                 retriever,  # Use the created retriever
-                 document_chain  # Use the created document chain
-            )
-
-            response = retrieval_chain.invoke(  # Invoke the retrieval chain
-                {'input': query_prompt}  # Pass the user's question as input
-            )
-        
-        with st.chat_message("assistant"):  # Create a chat message container for assistant
-            st.markdown(response['answer'])  # Display the assistant's response using markdown
-        st.session_state.messages.append({"role": "assistant", "content": response['answer']})  # Add assistant message to chat history
+            with st.chat_message("assistant"):  # Create a chat message container for assistant
+                st.markdown(response['answer'])  # Display the assistant's response using markdown
+            st.session_state.messages.append({"role": "assistant", "content": response['answer']})  # Add assistant message to chat history
+    else:
+        st.write("Please Upload Your File.")
 
 
 # Entry point for the application
