@@ -3,6 +3,8 @@
 ## 📌 Introduction
 The **PDF Question-Answering Chatbot** is an AI-powered assistant designed to help users extract information from any PDF document. This versatile tool allows you to upload your PDFs and ask questions about their content, receiving accurate and contextual responses. The system is built with **Streamlit**, **LangChain**, **FAISS**, and leverages state-of-the-art LLMs to generate dynamic responses.
 
+🔗 **Live App:** [course-faq-bot.streamlit.app](https://course-faq-bot.streamlit.app/)
+
 ## ✨ Features
 ✅ Process and analyze **any PDF document** you upload\
 ✅ Ask questions about document content and receive AI-generated answers\
@@ -41,6 +43,11 @@ PDF_Chatbot/
 ```
 
 ## 🏗️ Installation & Setup
+
+### 🌐 Using the Deployed App
+The easiest way to try the app is to visit the live deployment:
+- **Live App:** [course-faq-bot.streamlit.app](https://course-faq-bot.streamlit.app/)
+
 ### 1️⃣ Clone the Repository
 ```bash
 git clone https://github.com/Shafin008/FAQ_BOT.git
