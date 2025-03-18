@@ -39,7 +39,7 @@ VECTOR_STORE_NAME: str = "FAQ-BOT"  # Name of the vector store (not used in curr
 PERSIST_DIRECTORY: str = "./faiss_db"  # Directory to save the FAISS vector database
 
 # Streamlit UI Setup
-st.title("PDF Question Answering Chatbot 🤖")
+st.title("PDFSage: Ask Your Documents Anything 🤖")
 st.write("Upload any PDF document and ask questions about its content. The chatbot will provide answers based on the information in your document.")
 
 st.write("**How to use this app:**")
