@@ -103,17 +103,17 @@ def vector_embedding() -> None:
         with st.spinner("Loading & Chunkifying Documents..."):  # Show a spinner while processing documents
             st.session_state.documents = process_pdf(uploaded_file)  # Process the uploaded PDF and store chunks in session state
     
-    with st.spinner("Initializing Vector Database..."):  # Show a spinner while initializing the vector database
-        st.session_state.embeddings = OpenAIEmbeddings(  # Initialize OpenAI embeddings
-            model=EMBEDDING_MODEL_NAME,  # Use the specified embedding model
-            api_key=OPENAI_API_KEY  # Use the provided OpenAI API key
-        )
-    
-        st.session_state.vector_db = FAISS.from_documents(  # Create a FAISS vector database from documents
-            st.session_state.documents,  # Use the documents stored in session state
-            st.session_state.embeddings,  # Use the embeddings stored in session state
-        )
-        st.session_state.vector_db.save_local(PERSIST_DIRECTORY)  # Save the vector database locally
+        with st.spinner("Initializing Vector Database..."):  # Show a spinner while initializing the vector database
+            st.session_state.embeddings = OpenAIEmbeddings(  # Initialize OpenAI embeddings
+                model=EMBEDDING_MODEL_NAME,  # Use the specified embedding model
+                api_key=OPENAI_API_KEY  # Use the provided OpenAI API key
+            )
+        
+            st.session_state.vector_db = FAISS.from_documents(  # Create a FAISS vector database from documents
+                st.session_state.documents,  # Use the documents stored in session state
+                st.session_state.embeddings,  # Use the embeddings stored in session state
+            )
+            st.session_state.vector_db.save_local(PERSIST_DIRECTORY)  # Save the vector database locally
 
 
 def main() -> None:
