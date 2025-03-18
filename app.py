@@ -38,18 +38,6 @@ EMBEDDING_MODEL_NAME: str = "text-embedding-ada-002"  # Name of the OpenAI embed
 VECTOR_STORE_NAME: str = "FAQ-BOT"  # Name of the vector store (not used in current implementation)
 PERSIST_DIRECTORY: str = "./faiss_db"  # Directory to save the FAISS vector database
 
-# # Streamlit UI Setup
-# st.title("FAQ Chatbot 🤖")  # Set the app title
-# st.write("Please click the button below to get the ENGINE ready 🔥🔥🔥. Once the ENGINE is ready, please ask your questions.")  # Display instructions
-
-# # Additional information about the application
-# st.write(
-#     "For asking questions to this chatbot you can go to this course [website](https://github.com/DataTalksClub/data-engineering-zoomcamp) and ask any query about this course.")
-
-# # API key instructions
-# st.write(
-#     "To use this app, you need to provide a Groq API Key which you can get [here](https://console.groq.com/keys) and an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys)")
-
 # Streamlit UI Setup
 st.title("PDF Question Answering Chatbot 🤖")
 st.write("Upload any PDF document and ask questions about its content. The chatbot will provide answers based on the information in your document.")
