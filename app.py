@@ -32,186 +32,136 @@ from typing import List, Optional  # Import for type hints
 load_dotenv()
 
 # Constants for application configuration
-DATA_PATH: str = "./data/"  # Path to data directory (not used in current implementation)
 MODEL_NAME: str = "Llama3-8b-8192"  # Name of the Groq LLM model to use
 EMBEDDING_MODEL_NAME: str = "text-embedding-ada-002"  # Name of the OpenAI embedding model
 VECTOR_STORE_NAME: str = "FAQ-BOT"  # Name of the vector store (not used in current implementation)
 PERSIST_DIRECTORY: str = "./faiss_db"  # Directory to save the FAISS vector database
 
 # Streamlit UI Setup
-st.title("PDFSage: Ask Your Documents Anything 🤖")
-st.write("Upload any PDF document and ask questions about its content. The chatbot will provide answers based on the information in your document.")
+st.title("PDFSage: Ask Your Documents Anything 🤖")  # Set the title of the Streamlit app
+st.write("Upload any PDF document and ask questions about its content. The chatbot will provide answers based on the information in your document.")  # Description of the app
 
-st.write("**How to use this app:**")
-st.write("1. Enter your API keys in the section below")
-st.write("2. Upload a PDF file using the file uploader")
-st.write("3. Click 'Start Engine' to process your document")
-st.write("4. Ask questions about the content of your PDF")
+st.write("**How to use this app:**")  # Instructions for using the app
+st.write("1. Enter your required API keys in the section below")  # Step 1: Enter API keys
+st.write("2. Upload PDF file(s) using the file uploader")  # Step 2: Upload PDF
+st.write("3. Click 'Start Engine' to process your document")  # Step 3: Process document
+st.write("4. Ask questions about the content of your PDF(s)")  # Step 4: Ask questions
 
-# API key instructions
-st.write(
-    "To use this app, you need to provide a Groq API Key which you can get [here](https://console.groq.com/keys) and an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys)")
+# API Key Input
+with st.expander("Click here to enter your API KEYs"):  # Expandable section for API key input
+    GROQ_API_KEY: str = st.text_input("Groq API Key", type="password")  # Input for Groq API key
+    OPENAI_API_KEY: str = st.text_input("OpenAI API Key", type="password")  # Input for OpenAI API key
+    if not GROQ_API_KEY or not OPENAI_API_KEY:  # Check if API keys are provided
+        st.info("Please add your API keys to continue.", icon="🗝️")  # Display info message if keys are missing
+        st.stop()  # Stop the app if keys are missing
 
-# User API Key Input section in an expandable container
-with st.expander("Click here to enter your API KEYs"):
-    GROQ_API_KEY: str = st.text_input("Groq API Key", type="password")  # Text input for Groq API key with password masking
-    if not GROQ_API_KEY:  # Check if Groq API key is provided
-        st.info("Please add your Groq API key to continue.", icon="🗝️")  # Show info message if key is missing
-        st.stop()  # Stop execution if key is missing
-    
-    OPENAI_API_KEY: str = st.text_input("OpenAI API Key", type="password")  # Text input for OpenAI API key with password masking
-    if not OPENAI_API_KEY:  # Check if OpenAI API key is provided
-        st.info("Please add your OpenAI API key to continue.", icon="🗝️")  # Show info message if key is missing
-        st.stop()  # Stop execution if key is missing
-
-
+# Function to process PDF
 def process_documents(uploaded_files) -> List[Document]:
-    """
-    Loads and splits multiple uploaded PDF files into chunks.
+    """Loads and splits multiple uploaded PDF files into chunks.
     
     Args:
-        uploaded_files: List of uploaded PDF file objects
-        
+        uploaded_files: List of uploaded PDF files.
+    
     Returns:
-        List[Document]: A list of document chunks after splitting
+        List[Document]: List of document chunks.
     """
-    all_documents = []
-    for i, file in enumerate(uploaded_files):
+    all_documents = []  # Initialize an empty list to store all documents
+    for i, file in enumerate(uploaded_files): # Iterate over each uploaded file
         # Create a unique filename for each uploaded file
-        temp_filename = f"temp_{i}.pdf"
-        
+        temp_filename = f"temp_{i}.pdf"  
         with open(temp_filename, "wb") as f:
-            f.write(file.read())
-        
-        loader = PyPDFLoader(temp_filename)
-        documents = loader.load()
-        
-        # Add source information to each document
-        for doc in documents:
-            doc.metadata["source"] = file.name
-            
-        all_documents.extend(documents)
-    
-    # Split all documents into chunks
-    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    return splitter.split_documents(all_documents)
+            f.write(file.read())  # Write the file content to disk
+        loader = PyPDFLoader(temp_filename)  # Load the PDF file using PyPDFLoader
+        documents = loader.load()  # Load the documents from the PDF
+        for doc in documents:  # Iterate over each document
+            doc.metadata["source"] = file.name  # Add the source file name to the document metadata
+        all_documents.extend(documents)  # Add the documents to the list
+    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)  # Initialize the text splitter
+    return splitter.split_documents(all_documents)  # Split the documents into chunks and return
 
-# File upload section 
-uploaded_files = st.file_uploader("Upload PDF files", type=["pdf"], accept_multiple_files=True) # Create a file uploader for PDF files
+# File Upload
+uploaded_files = st.file_uploader("Upload PDF files", type=["pdf"], accept_multiple_files=True)  # File uploader for PDFs
 
-
+# Vector Embedding
 def vector_embedding() -> None:
-    """
-    Processes and embeds documents into a vector database.
-    
-    This function handles:
-    1. Processing uploaded PDF files
-    2. Initializing OpenAI embeddings
-    3. Creating and saving a FAISS vector database
-    """
-    # if "vector_db" in st.session_state:  # Check if vector_db already exists in session state
-    #     del st.session_state.vector_db  # Delete existing vector database from session state
-    
-    
-    if uploaded_files and len(uploaded_files) > 0:
-        with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):
-            st.session_state.documents = process_documents(uploaded_files)
-            
-        with st.spinner("Initializing Vector Database..."):
-            st.session_state.embeddings = OpenAIEmbeddings(
+    """Processes and embeds documents into a vector database."""
+    if "vector_db" in st.session_state:  # Check if vector database exists in session state
+        del st.session_state.vector_db  # Reset vector DB if it exists
+    if uploaded_files and len(uploaded_files) > 0:  # Check if files are uploaded
+        with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):  # Show spinner while processing documents
+            st.session_state.documents = process_documents(uploaded_files)  # Process and store documents in session state
+        with st.spinner("Initializing Vector Database..."):  # Show spinner while initializing vector database
+            st.session_state.embeddings = OpenAIEmbeddings(  # Initialize OpenAI embeddings
                 model=EMBEDDING_MODEL_NAME,
                 api_key=OPENAI_API_KEY
             )
-        
-            st.session_state.vector_db = FAISS.from_documents(
+            st.session_state.vector_db = FAISS.from_documents(  # Create FAISS vector database from documents
                 st.session_state.documents,
                 st.session_state.embeddings,
             )
-            st.session_state.vector_db.save_local(PERSIST_DIRECTORY)
+            st.session_state.vector_db.save_local(PERSIST_DIRECTORY)  # Save the vector database locally
     else:
-        st.error("Please upload at least one PDF file.")
+        st.error("Please upload at least one PDF file.")  # Show error if no files are uploaded
 
-
+# Main Function
 def main() -> None:
-    """
-    Runs the main chatbot application.
-    
-    This function handles:
-    1. Managing chat history
-    2. Processing user input
-    3. Retrieving relevant document chunks
-    4. Generating responses using the LLM
-    5. Displaying the conversation
-    """
+    """Runs the main chatbot application."""
+    if "messages" not in st.session_state:  # Check if chat messages exist in session state
+        st.session_state.messages = []  # Initialize an empty list for chat messages
 
-    if "messages" not in st.session_state:  # Check if messages already exist in session state
-        st.session_state.messages = []  # Initialize empty messages list in session state
-
-    
-    if st.button("Start Engine"):  # Create a button to start the engine
-        # making sure user uploads file before the embedding starts
-        if uploaded_files:
-            vector_embedding()  # Call the vector_embedding function when button is clicked
-            st.success("The Engine is ready.", icon="✅")  # Show success message when engine is ready
+    if st.button("Start Engine"):  # Button to start the engine
+        if uploaded_files:  # Check if files are uploaded
+            vector_embedding()  # Process and embed documents
+            st.success("The Engine is ready.", icon="✅")  # Show success message
             st.session_state.messages = []  # Reset chat history
         else:
-            # If the user don't supply any documents then it gives a reply
-            st.write("Please Upload Your File.")
-        
+            st.write("Please Upload Your File.")  # Prompt to upload files
     
-    for message in st.session_state.messages:  # Iterate through all messages in the chat history
-        with st.chat_message(message["role"]):  # Create a chat message container with appropriate role
-            st.markdown(message["content"])  # Display the message content using markdown
+    for message in st.session_state.messages:  # Iterate over chat messages
+        with st.chat_message(message["role"]):  # Display chat message based on role (user/assistant)
+            st.markdown(message["content"])  # Display the message content
 
-    # Define the prompt template for the chatbot
-    prompt_template = ChatPromptTemplate.from_template(
+    prompt_template = ChatPromptTemplate.from_template(  # Create a prompt template for the chatbot
         """
-        You are an AI language model assistant who is expert in answering questions about the uploaded document from the provided context. Please provide the most accurate response based on the question. Please, remember what answer you gave previously. Also, at the end of your answer, ask the user if they are satisfied with your answer or need further assistance. If the user is satisfied and the {input} is positive such as 'yes', 'thanks', thank you', etc. then you don't need to answer based on the context, you just give a positive and satisfactory reply and stop asking anything. For further assistance, if the {input} is 'no' or 'no thanks', that means you don't need to answer based on the context, you just give a positive and satisfactory reply and stop asking anything. Don't write extra words in your answer if the user is satisfied or don't need assistance.
+        You are an AI language model assistant who is expert in answering questions about the uploaded document from the provided context. Please provide the most accurate response based on the question. Please, remember what answer you gave previously. Use the previous conversation to improve your responses.
+        
+        Also, at the end of your answer, ask the user if they are satisfied with your answer or need further assistance. If the user is satisfied and the {input} is positive such as 'yes', 'thanks', thank you', etc. then you don't need to answer based on the context,you just give a positive and satisfactory reply and stop asking anything. For further assistance, if the {input} is 'no' or 'no thanks', that means you don't need to answer based on the context, you just give a positive and satisfactory reply and stop asking anything. Don't write extra words in your answer if the user is satisfied or don't need assistance.
+
         <context>
         {context}
         <context>
 
+        <Previous Conversation>
+        {history}
+        <Previous Conversation>
+
         Question: {input}
+        
         """
     )
-    
-    query_prompt: Optional[str] = st.chat_input("Enter Your Question Regarding the course....")  # Create a chat input for user questions
-    
-    if uploaded_files:
-        if query_prompt:  # Check if user has entered a question
-            with st.chat_message("user"):  # Create a chat message container for user
-                st.markdown(query_prompt)  # Display the user's question using markdown
-            st.session_state.messages.append({"role": "user", "content": query_prompt})  # Add user message to chat history
 
-            with st.spinner("Generating response..."):  # Show a spinner while generating response
-                llm = ChatGroq(  # Initialize ChatGroq LLM
-                    model=MODEL_NAME,  # Use the specified model
-                    api_key=GROQ_API_KEY  # Use the provided Groq API key
-                )
-                
-                document_chain = create_stuff_documents_chain(  # Create a chain for combining documents with prompt
-                    llm,  # Use the initialized LLM
-                    prompt_template  # Use the defined prompt template
-                )
+    query_prompt: Optional[str] = st.chat_input("Ask a question about your document...")  # Input for user query
+    if uploaded_files and query_prompt:  # Check if files are uploaded and query is provided
+        with st.chat_message("user"):  # Display user message
+            st.markdown(query_prompt)  # Display the user query
+        st.session_state.messages.append({"role": "user", "content": query_prompt})  # Add user query to chat history
 
-                retriever = st.session_state.vector_db.as_retriever()  # Convert vector database to retriever
-                
-                retrieval_chain = create_retrieval_chain(  # Create a retrieval chain
-                    retriever,  # Use the created retriever
-                    document_chain  # Use the created document chain
-                )
+        with st.spinner("Generating response..."):  # Show spinner while generating response
+            history = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.messages])  # Create chat history string
 
-                response = retrieval_chain.invoke(  # Invoke the retrieval chain
-                    {'input': query_prompt}  # Pass the user's question as input
-                )
-            
-            with st.chat_message("assistant"):  # Create a chat message container for assistant
-                st.markdown(response['answer'])  # Display the assistant's response using markdown
-            st.session_state.messages.append({"role": "assistant", "content": response['answer']})  # Add assistant message to chat history
-    else:
-        st.write("Please Upload Your File.")
+            llm = ChatGroq(model=MODEL_NAME, api_key=GROQ_API_KEY)  # Initialize Groq LLM
 
+            document_chain = create_stuff_documents_chain(llm, prompt_template)  # Create document chain for processing
 
-# Entry point for the application
+            retriever = st.session_state.vector_db.as_retriever()  # Create retriever from vector database
+
+            retrieval_chain = create_retrieval_chain(retriever, document_chain)  # Create retrieval chain
+
+            response = retrieval_chain.invoke({"input": query_prompt, "history": history})  # Invoke the retrieval chain with user query and history
+        
+        with st.chat_message("assistant"):  # Display assistant message
+            st.markdown(response['answer'])  # Display the assistant's response
+        st.session_state.messages.append({"role": "assistant", "content": response['answer']})  # Add assistant response to chat history
+
 if __name__ == "__main__":
-    main()  # Call the main function when script is executed directly
+    main()  # Run the main function when the script is executed
