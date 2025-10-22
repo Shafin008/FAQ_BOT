@@ -45,10 +45,22 @@ VECTOR_STORE_NAME: str = "FAQ-BOT"  # Name of the vector store (not used in curr
 PERSIST_DIRECTORY: str = "./faiss_db"  # Directory to save the FAISS vector database
 
 # Load model once (Runs only the first time)
+# @st.cache_resource
+# def load_embedding_model():
+#     model_name = "mxbai-embed-large"
+#     ollama.pull(model_name)  # Ensure model is downloaded
+#     return model_name
+
 @st.cache_resource
 def load_embedding_model():
-    model_name = "mxbai-embed-large"
-    ollama.pull(model_name)  # Ensure model is downloaded
+    """Load embedding model (OpenAI for cloud deployment)"""
+    model_name = "text-embedding-3-small"  # or "text-embedding-ada-002"
+    
+    # Check if OpenAI API key is available
+    if not os.getenv("OPENAI_API_KEY"):
+        st.error("OpenAI API key not found. Please add it to your secrets.")
+        st.stop()
+    
     return model_name
 
 # EMBEDDING_MODEL_NAME: str = "text-embedding-ada-002"  # Name of the OpenAI embedding model
@@ -118,9 +130,10 @@ def vector_embedding() -> None:
             # st.session_state.embeddings = OpenAIEmbeddings(  # Initialize OpenAI embeddings
             #     model=EMBEDDING_MODEL_NAME,
             # )
-            st.session_state.embeddings = OllamaEmbeddings(  # Initialize OpenAI embeddings
-                model=EMBEDDING_MODEL_NAME,
-            )
+            # st.session_state.embeddings = OllamaEmbeddings(  # Initialize OpenAI embeddings
+            #     model=EMBEDDING_MODEL_NAME,
+            # )
+			st.session_state.embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL_NAME)
             st.session_state.vector_db = FAISS.from_documents(  # Create FAISS vector database from documents
                 st.session_state.documents,
                 st.session_state.embeddings,
