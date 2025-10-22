@@ -27,7 +27,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate  # Import for creating prompt templates
 # from langchain.chains import create_retrieval_chain  # Import for creating retrieval chains
-from langchain.chains import create_retrieval_chain
+from langchain.chains.retrieval import create_retrieval_chain
 from langchain_community.vectorstores import FAISS  # Import for vector database
 from langchain_community.document_loaders import PyPDFDirectoryLoader, PyPDFLoader  # Import for loading PDFs
 from langchain_openai import OpenAIEmbeddings  # Import for OpenAI embeddings
