@@ -226,7 +226,7 @@ from typing import List, Optional
 load_dotenv()
 
 # Constants
-MODEL_NAME = "Llama3-8b-8192"
+MODEL_NAME = "llama3-8b-8192"  # Fixed: lowercase model name
 EMBEDDING_MODEL_NAME = "text-embedding-3-small"
 PERSIST_DIRECTORY = "./faiss_db"
 
@@ -242,8 +242,8 @@ st.write("4. Ask questions about the content of your PDF(s)")
 
 # API Key Input
 with st.expander("Click here to enter your API KEYs"):
-    GROQ_API_KEY = st.text_input("Groq API Key", type="password")
-    OPENAI_API_KEY = st.text_input("OpenAI API Key", type="password")
+    GROQ_API_KEY = st.text_input("Groq API Key", type="password", value=os.getenv("GROQ_API_KEY", ""))
+    OPENAI_API_KEY = st.text_input("OpenAI API Key", type="password", value=os.getenv("OPENAI_API_KEY", ""))
     
     if not GROQ_API_KEY or not OPENAI_API_KEY:
         st.info("Please add your API keys to continue.", icon="🗝️")
@@ -269,9 +269,15 @@ def process_documents(uploaded_files) -> List[Document]:
             doc.metadata["source"] = file.name
         
         all_documents.extend(documents)
-        os.remove(temp_filename)  # Clean up temp file
+        
+        # Clean up temp file
+        try:
+            os.remove(temp_filename)
+        except:
+            pass
     
-    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    # Smaller chunk size to avoid token limits
+    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
     return splitter.split_documents(all_documents)
 
 
@@ -318,67 +324,78 @@ def main() -> None:
         else:
             st.warning("Please upload your files first.")
     
-    # Display chat history
-    for message in st.session_state.messages:
+    # Display chat history (last 10 messages to avoid context overflow)
+    display_messages = st.session_state.messages[-10:]
+    for message in display_messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
     
-    # Prompt template
+    # Simplified prompt template
     prompt_template = ChatPromptTemplate.from_template(
         """
-        You are an AI assistant expert in answering questions about uploaded documents. 
-        Provide accurate responses based on the question and context. Use previous 
-        conversation history to improve your responses.
-        
-        At the end of your answer, ask if the user needs further assistance. If they 
-        respond positively (yes, thanks, etc.) or negatively (no, no thanks), provide 
-        a brief satisfactory reply without asking additional questions.
+        You are an AI assistant. Answer the question based on the context provided.
+        Keep your answer concise and relevant.
 
-        <context>
-        {context}
-        </context>
-
-        <previous_conversation>
-        {history}
-        </previous_conversation>
+        Context: {context}
 
         Question: {input}
-        """
+        
+        Answer:"""
     )
     
     # Chat input
     query_prompt = st.chat_input("Ask a question about your document...")
     
     if query_prompt and uploaded_files:
+        # Check if vector DB exists
+        if "vector_db" not in st.session_state:
+            st.warning("Please click 'Start Engine' first to process your documents.")
+            return
+        
         # Display user message
         with st.chat_message("user"):
             st.markdown(query_prompt)
         st.session_state.messages.append({"role": "user", "content": query_prompt})
         
         # Generate response
-        with st.spinner("Generating response..."):
-            history = "\n".join([
-                f"{msg['role']}: {msg['content']}" 
-                for msg in st.session_state.messages
-            ])
+        try:
+            with st.spinner("Generating response..."):
+                llm = ChatGroq(
+                    model=MODEL_NAME, 
+                    api_key=GROQ_API_KEY,
+                    temperature=0.3,
+                    max_tokens=1024  # Limit response length
+                )
+                
+                document_chain = create_stuff_documents_chain(llm, prompt_template)
+                
+                # Retrieve only top 3 most relevant documents
+                retriever = st.session_state.vector_db.as_retriever(
+                    search_kwargs={"k": 3}
+                )
+                
+                retrieval_chain = create_retrieval_chain(retriever, document_chain)
+                
+                response = retrieval_chain.invoke({"input": query_prompt})
             
-            llm = ChatGroq(model=MODEL_NAME, api_key=GROQ_API_KEY)
-            document_chain = create_stuff_documents_chain(llm, prompt_template)
-            retriever = st.session_state.vector_db.as_retriever()
-            retrieval_chain = create_retrieval_chain(retriever, document_chain)
-            
-            response = retrieval_chain.invoke({
-                "input": query_prompt, 
-                "history": history
+            # Display assistant message
+            with st.chat_message("assistant"):
+                st.markdown(response['answer'])
+            st.session_state.messages.append({
+                "role": "assistant", 
+                "content": response['answer']
             })
-        
-        # Display assistant message
-        with st.chat_message("assistant"):
-            st.markdown(response['answer'])
-        st.session_state.messages.append({
-            "role": "assistant", 
-            "content": response['answer']
-        })
+            
+        except Exception as e:
+            error_msg = str(e)
+            if "rate_limit" in error_msg.lower():
+                st.error("⚠️ Rate limit exceeded. Please wait a moment and try again.")
+            elif "api_key" in error_msg.lower():
+                st.error("⚠️ Invalid API key. Please check your Groq API key.")
+            elif "token" in error_msg.lower():
+                st.error("⚠️ Context too long. Try asking a more specific question or upload smaller documents.")
+            else:
+                st.error(f"⚠️ An error occurred: {error_msg}")
     
     elif query_prompt and not uploaded_files:
         st.warning("Please upload and process your PDF files first.")
