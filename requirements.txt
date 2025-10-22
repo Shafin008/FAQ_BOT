@@ -9,8 +9,7 @@ langchain-community==0.3.17
 
 # LangChain model integrations
 langchain-groq==0.2.4
-langchain-ollama==0.2.3
-langchain-openai>=0.1.0
+
 
 # LangChain utilities
 langchain-text-splitters>=0.2.0
