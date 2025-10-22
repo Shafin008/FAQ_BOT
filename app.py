@@ -133,7 +133,9 @@ def vector_embedding() -> None:
             # st.session_state.embeddings = OllamaEmbeddings(  # Initialize OpenAI embeddings
             #     model=EMBEDDING_MODEL_NAME,
             # )
-			st.session_state.embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL_NAME)
+			st.session_state.embeddings = OpenAIEmbeddings(
+				model=EMBEDDING_MODEL_NAME,
+			)
             st.session_state.vector_db = FAISS.from_documents(  # Create FAISS vector database from documents
                 st.session_state.documents,
                 st.session_state.embeddings,
