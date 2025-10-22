@@ -18,15 +18,15 @@ from dotenv import load_dotenv  # Import to load environment variables from .env
 import streamlit as st  # Import Streamlit for the web application interface
 from langchain_groq import ChatGroq  # Import for using Groq's language models
 from langchain_ollama import OllamaEmbeddings  # Import for local embeddings (not used but available)
-# from langchain.text_splitter import RecursiveCharacterTextSplitter  # Import for splitting documents into chunks
+# Import for splitting documents into chunks
 # New import
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# from langchain.chains.combine_documents import create_stuff_documents_chain  # Import for creating document chains
+# Import for creating document chains
 # New imports
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate  # Import for creating prompt templates
-# from langchain.chains import create_retrieval_chain  # Import for creating retrieval chains
+
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain_community.vectorstores import FAISS  # Import for vector database
 from langchain_community.document_loaders import PyPDFDirectoryLoader, PyPDFLoader  # Import for loading PDFs
