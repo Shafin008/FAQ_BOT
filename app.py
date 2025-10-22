@@ -18,24 +18,42 @@ from dotenv import load_dotenv  # Import to load environment variables from .env
 import streamlit as st  # Import Streamlit for the web application interface
 from langchain_groq import ChatGroq  # Import for using Groq's language models
 from langchain_ollama import OllamaEmbeddings  # Import for local embeddings (not used but available)
-from langchain.text_splitter import RecursiveCharacterTextSplitter  # Import for splitting documents into chunks
-from langchain.chains.combine_documents import create_stuff_documents_chain  # Import for creating document chains
+# from langchain.text_splitter import RecursiveCharacterTextSplitter  # Import for splitting documents into chunks
+# New import
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# from langchain.chains.combine_documents import create_stuff_documents_chain  # Import for creating document chains
+# New imports
+from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate  # Import for creating prompt templates
-from langchain.chains import create_retrieval_chain  # Import for creating retrieval chains
+# from langchain.chains import create_retrieval_chain  # Import for creating retrieval chains
+from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS  # Import for vector database
 from langchain_community.document_loaders import PyPDFDirectoryLoader, PyPDFLoader  # Import for loading PDFs
 from langchain_openai import OpenAIEmbeddings  # Import for OpenAI embeddings
 from langchain_core.documents import Document  # Import for document type
 from typing import List, Optional  # Import for type hints
+from langchain_ollama import OllamaEmbeddings
+import ollama
 
 # Load environment variables from .env file if present
 load_dotenv()
 
 # Constants for application configuration
 MODEL_NAME: str = "Llama3-8b-8192"  # Name of the Groq LLM model to use
-EMBEDDING_MODEL_NAME: str = "text-embedding-ada-002"  # Name of the OpenAI embedding model
 VECTOR_STORE_NAME: str = "FAQ-BOT"  # Name of the vector store (not used in current implementation)
 PERSIST_DIRECTORY: str = "./faiss_db"  # Directory to save the FAISS vector database
+
+# Load model once (Runs only the first time)
+@st.cache_resource
+def load_embedding_model():
+    model_name = "mxbai-embed-large"
+    ollama.pull(model_name)  # Ensure model is downloaded
+    return model_name
+
+# EMBEDDING_MODEL_NAME: str = "text-embedding-ada-002"  # Name of the OpenAI embedding model
+EMBEDDING_MODEL_NAME: str = load_embedding_model()
+
 
 # Streamlit UI Setup
 st.title("PDFSage: Ask Your Documents Anything 🤖")  # Set the title of the Streamlit app
@@ -50,10 +68,16 @@ st.write("4. Ask questions about the content of your PDF(s)")  # Step 4: Ask que
 # API Key Input
 with st.expander("Click here to enter your API KEYs"):  # Expandable section for API key input
     GROQ_API_KEY: str = st.text_input("Groq API Key", type="password")  # Input for Groq API key
-    OPENAI_API_KEY: str = st.text_input("OpenAI API Key", type="password")  # Input for OpenAI API key
-    if not GROQ_API_KEY or not OPENAI_API_KEY:  # Check if API keys are provided
+    # OPENAI_API_KEY: str = st.text_input("OpenAI API Key", type="password")  # Input for OpenAI API key
+    # if not GROQ_API_KEY or not OPENAI_API_KEY:  # Check if API keys are provided
+    #     st.info("Please add your API keys to continue.", icon="🗝️")  # Display info message if keys are missing
+    #     st.stop()  # Stop the app if keys are missing
+
+    
+    if not GROQ_API_KEY:  # Check if API keys are provided
         st.info("Please add your API keys to continue.", icon="🗝️")  # Display info message if keys are missing
         st.stop()  # Stop the app if keys are missing
+
 
 # Function to process PDF
 def process_documents(uploaded_files) -> List[Document]:
@@ -91,9 +115,11 @@ def vector_embedding() -> None:
         with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):  # Show spinner while processing documents
             st.session_state.documents = process_documents(uploaded_files)  # Process and store documents in session state
         with st.spinner("Initializing Vector Database..."):  # Show spinner while initializing vector database
-            st.session_state.embeddings = OpenAIEmbeddings(  # Initialize OpenAI embeddings
+            # st.session_state.embeddings = OpenAIEmbeddings(  # Initialize OpenAI embeddings
+            #     model=EMBEDDING_MODEL_NAME,
+            # )
+            st.session_state.embeddings = OllamaEmbeddings(  # Initialize OpenAI embeddings
                 model=EMBEDDING_MODEL_NAME,
-                api_key=OPENAI_API_KEY
             )
             st.session_state.vector_db = FAISS.from_documents(  # Create FAISS vector database from documents
                 st.session_state.documents,
