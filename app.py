@@ -226,7 +226,7 @@ from typing import List, Optional
 load_dotenv()
 
 # Constants
-MODEL_NAME = "llama3-8b-8192"  # Fixed: lowercase model name
+MODEL_NAME = "llama-3.1-8b-instant"  # Fixed: lowercase model name
 EMBEDDING_MODEL_NAME = "text-embedding-3-small"
 PERSIST_DIRECTORY = "./faiss_db"
 
